@@ -2,6 +2,6 @@
     ./.babelrc
 */  
 {
-    "presets":["env", "es2015", "react"],
+    "presets":["env", "react"],
 		"plugins":["transform-object-rest-spread","transform-es2015-parameters","transform-es2015-destructuring"]
 }
