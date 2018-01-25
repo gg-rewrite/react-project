@@ -1,0 +1,514 @@
+--
+-- PostgreSQL database dump
+--
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET search_path = public, pg_catalog;
+
+--
+-- Name: common_seq; Type: SEQUENCE; Schema: public; Owner: video_user
+--
+
+CREATE SEQUENCE common_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.common_seq OWNER TO video_user;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: category_video_rel; Type: TABLE; Schema: public; Owner: video_user; Tablespace: 
+--
+
+CREATE TABLE category_video_rel (
+    id integer DEFAULT nextval('common_seq'::regclass) NOT NULL,
+    video_id integer,
+    category_id integer
+);
+
+
+ALTER TABLE public.category_video_rel OWNER TO video_user;
+
+--
+-- Name: comments; Type: TABLE; Schema: public; Owner: video_user; Tablespace: 
+--
+
+CREATE TABLE comments (
+    id integer DEFAULT nextval('common_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    video_id integer NOT NULL,
+    text character varying(200) NOT NULL
+);
+
+
+ALTER TABLE public.comments OWNER TO video_user;
+
+--
+-- Name: likes; Type: TABLE; Schema: public; Owner: video_user; Tablespace: 
+--
+
+CREATE TABLE likes (
+    id integer DEFAULT nextval('common_seq'::regclass) NOT NULL,
+    video_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+
+ALTER TABLE public.likes OWNER TO video_user;
+
+--
+-- Name: playlist_video_rel; Type: TABLE; Schema: public; Owner: video_user; Tablespace: 
+--
+
+CREATE TABLE playlist_video_rel (
+    id integer DEFAULT nextval('common_seq'::regclass) NOT NULL,
+    playlist_id integer NOT NULL,
+    video_id integer NOT NULL
+);
+
+
+ALTER TABLE public.playlist_video_rel OWNER TO video_user;
+
+--
+-- Name: playlists; Type: TABLE; Schema: public; Owner: video_user; Tablespace: 
+--
+
+CREATE TABLE playlists (
+    id integer DEFAULT nextval('common_seq'::regclass) NOT NULL,
+    user_id integer NOT NULL,
+    name character varying(100) NOT NULL,
+    description character varying(200)
+);
+
+
+ALTER TABLE public.playlists OWNER TO video_user;
+
+--
+-- Name: session; Type: TABLE; Schema: public; Owner: user2; Tablespace: 
+--
+
+CREATE TABLE session (
+    sid character varying NOT NULL,
+    sess json NOT NULL,
+    expire timestamp(6) without time zone NOT NULL
+);
+
+
+ALTER TABLE public.session OWNER TO user2;
+
+--
+-- Name: user_role_seq; Type: SEQUENCE; Schema: public; Owner: video_user
+--
+
+CREATE SEQUENCE user_role_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_role_seq OWNER TO video_user;
+
+--
+-- Name: user_roles; Type: TABLE; Schema: public; Owner: video_user; Tablespace: 
+--
+
+CREATE TABLE user_roles (
+    id integer DEFAULT nextval('user_role_seq'::regclass) NOT NULL,
+    name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.user_roles OWNER TO video_user;
+
+--
+-- Name: user_seq; Type: SEQUENCE; Schema: public; Owner: video_user
+--
+
+CREATE SEQUENCE user_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_seq OWNER TO video_user;
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: video_user; Tablespace: 
+--
+
+CREATE TABLE users (
+    id integer DEFAULT nextval('user_seq'::regclass) NOT NULL,
+    name character varying(100) NOT NULL,
+    password character varying(100) NOT NULL,
+    role_id integer NOT NULL
+);
+
+
+ALTER TABLE public.users OWNER TO video_user;
+
+--
+-- Name: video_categories; Type: TABLE; Schema: public; Owner: video_user; Tablespace: 
+--
+
+CREATE TABLE video_categories (
+    id integer DEFAULT nextval('common_seq'::regclass) NOT NULL,
+    name character varying(100) NOT NULL,
+    description character varying(200)
+);
+
+
+ALTER TABLE public.video_categories OWNER TO video_user;
+
+--
+-- Name: video_seq; Type: SEQUENCE; Schema: public; Owner: video_user
+--
+
+CREATE SEQUENCE video_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.video_seq OWNER TO video_user;
+
+--
+-- Name: videos; Type: TABLE; Schema: public; Owner: video_user; Tablespace: 
+--
+
+CREATE TABLE videos (
+    id integer DEFAULT nextval('video_seq'::regclass) NOT NULL,
+    description character varying(200),
+    location character varying(200) NOT NULL,
+    views integer DEFAULT 0
+);
+
+
+ALTER TABLE public.videos OWNER TO video_user;
+
+--
+-- Data for Name: category_video_rel; Type: TABLE DATA; Schema: public; Owner: video_user
+--
+
+COPY category_video_rel (id, video_id, category_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: comments; Type: TABLE DATA; Schema: public; Owner: video_user
+--
+
+COPY comments (id, user_id, video_id, text) FROM stdin;
+\.
+
+
+--
+-- Name: common_seq; Type: SEQUENCE SET; Schema: public; Owner: video_user
+--
+
+SELECT pg_catalog.setval('common_seq', 15, true);
+
+
+--
+-- Data for Name: likes; Type: TABLE DATA; Schema: public; Owner: video_user
+--
+
+COPY likes (id, video_id, user_id) FROM stdin;
+15	2	8
+\.
+
+
+--
+-- Data for Name: playlist_video_rel; Type: TABLE DATA; Schema: public; Owner: video_user
+--
+
+COPY playlist_video_rel (id, playlist_id, video_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: playlists; Type: TABLE DATA; Schema: public; Owner: video_user
+--
+
+COPY playlists (id, user_id, name, description) FROM stdin;
+12	8	New playlist	for da best
+\.
+
+
+--
+-- Data for Name: session; Type: TABLE DATA; Schema: public; Owner: user2
+--
+
+COPY session (sid, sess, expire) FROM stdin;
+\.
+
+
+--
+-- Name: user_role_seq; Type: SEQUENCE SET; Schema: public; Owner: video_user
+--
+
+SELECT pg_catalog.setval('user_role_seq', 4, true);
+
+
+--
+-- Data for Name: user_roles; Type: TABLE DATA; Schema: public; Owner: video_user
+--
+
+COPY user_roles (id, name) FROM stdin;
+1	admin
+2	user
+\.
+
+
+--
+-- Name: user_seq; Type: SEQUENCE SET; Schema: public; Owner: video_user
+--
+
+SELECT pg_catalog.setval('user_seq', 8, true);
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: video_user
+--
+
+COPY users (id, name, password, role_id) FROM stdin;
+1	nyan	wrrgh	2
+8	Madoka	111	2
+\.
+
+
+--
+-- Data for Name: video_categories; Type: TABLE DATA; Schema: public; Owner: video_user
+--
+
+COPY video_categories (id, name, description) FROM stdin;
+1	Most Popular	
+2	Most Liked	
+4	Offensive Chinese Cartoons	For those not offended enough today.
+5	Inoffensive Chinese Cartoons	For those just wanting their does of Chinese cartoons.
+\.
+
+
+--
+-- Name: video_seq; Type: SEQUENCE SET; Schema: public; Owner: video_user
+--
+
+SELECT pg_catalog.setval('video_seq', 3, true);
+
+
+--
+-- Data for Name: videos; Type: TABLE DATA; Schema: public; Owner: video_user
+--
+
+COPY videos (id, description, location, views) FROM stdin;
+3	Kyouko dresses up for Mami and Sayaka, Sayaka is not amused	videoToUpload-1495539836611	0
+2	Madoka does naughty stuff to Homura, Homura likes it	videoToUpload-1495471466627	4
+\.
+
+
+--
+-- Name: category_video_rel_pkey; Type: CONSTRAINT; Schema: public; Owner: video_user; Tablespace: 
+--
+
+ALTER TABLE ONLY category_video_rel
+    ADD CONSTRAINT category_video_rel_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: comments_pkey; Type: CONSTRAINT; Schema: public; Owner: video_user; Tablespace: 
+--
+
+ALTER TABLE ONLY comments
+    ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: likes_pkey; Type: CONSTRAINT; Schema: public; Owner: video_user; Tablespace: 
+--
+
+ALTER TABLE ONLY likes
+    ADD CONSTRAINT likes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: playlist_video_rel_pkey; Type: CONSTRAINT; Schema: public; Owner: video_user; Tablespace: 
+--
+
+ALTER TABLE ONLY playlist_video_rel
+    ADD CONSTRAINT playlist_video_rel_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: playlists_pkey; Type: CONSTRAINT; Schema: public; Owner: video_user; Tablespace: 
+--
+
+ALTER TABLE ONLY playlists
+    ADD CONSTRAINT playlists_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: session_pkey; Type: CONSTRAINT; Schema: public; Owner: user2; Tablespace: 
+--
+
+ALTER TABLE ONLY session
+    ADD CONSTRAINT session_pkey PRIMARY KEY (sid);
+
+
+--
+-- Name: user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: video_user; Tablespace: 
+--
+
+ALTER TABLE ONLY user_roles
+    ADD CONSTRAINT user_roles_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: video_user; Tablespace: 
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: video_categories_pkey; Type: CONSTRAINT; Schema: public; Owner: video_user; Tablespace: 
+--
+
+ALTER TABLE ONLY video_categories
+    ADD CONSTRAINT video_categories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: videos_pkey; Type: CONSTRAINT; Schema: public; Owner: video_user; Tablespace: 
+--
+
+ALTER TABLE ONLY videos
+    ADD CONSTRAINT videos_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: category_video_rel_category_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: video_user
+--
+
+ALTER TABLE ONLY category_video_rel
+    ADD CONSTRAINT category_video_rel_category_id_fkey FOREIGN KEY (category_id) REFERENCES video_categories(id);
+
+
+--
+-- Name: category_video_rel_video_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: video_user
+--
+
+ALTER TABLE ONLY category_video_rel
+    ADD CONSTRAINT category_video_rel_video_id_fkey FOREIGN KEY (video_id) REFERENCES videos(id);
+
+
+--
+-- Name: comments_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: video_user
+--
+
+ALTER TABLE ONLY comments
+    ADD CONSTRAINT comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: comments_video_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: video_user
+--
+
+ALTER TABLE ONLY comments
+    ADD CONSTRAINT comments_video_id_fkey FOREIGN KEY (video_id) REFERENCES videos(id);
+
+
+--
+-- Name: likes_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: video_user
+--
+
+ALTER TABLE ONLY likes
+    ADD CONSTRAINT likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: likes_video_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: video_user
+--
+
+ALTER TABLE ONLY likes
+    ADD CONSTRAINT likes_video_id_fkey FOREIGN KEY (video_id) REFERENCES videos(id);
+
+
+--
+-- Name: playlist_video_rel_playlist_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: video_user
+--
+
+ALTER TABLE ONLY playlist_video_rel
+    ADD CONSTRAINT playlist_video_rel_playlist_id_fkey FOREIGN KEY (playlist_id) REFERENCES playlists(id);
+
+
+--
+-- Name: playlist_video_rel_video_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: video_user
+--
+
+ALTER TABLE ONLY playlist_video_rel
+    ADD CONSTRAINT playlist_video_rel_video_id_fkey FOREIGN KEY (video_id) REFERENCES videos(id);
+
+
+--
+-- Name: playlists_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: video_user
+--
+
+ALTER TABLE ONLY playlists
+    ADD CONSTRAINT playlists_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+
+--
+-- Name: users_role_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: video_user
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id) REFERENCES user_roles(id);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
