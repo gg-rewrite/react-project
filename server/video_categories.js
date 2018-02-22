@@ -70,14 +70,16 @@ video_categories.delete('/:id', function(req, res) {
 
 	if (req.params.id > 2) {
 
-		dbconst.db.none("delete from video_categories where id = $1", [req.params.id])
-		.then(function(data) {
-			console.log("delete successful");
-			res.sendStatus(200);
-		}).catch(function(err) {
-			console.log("Query error: " + err);
-			res.sendStatus(500);
-		});
+	    dbconst.db.none("delete from category_video_rel where category_id = $1", [req.params.id])
+		   .then(function(data) {
+		       dbconst.db.none("delete from video_categories where id = $1", [req.params.id])
+		   }).then(function(data) {
+		       console.log("delete successful");
+		       res.sendStatus(200);
+		   }).catch(function(err) {
+		       console.log("query error: " + err);
+		       res.sendStatus(500);
+		   });
 	} else {
 		res.sendStatus(400);
 	}

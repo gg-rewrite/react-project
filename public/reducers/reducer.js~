@@ -1,0 +1,13 @@
+import { combineReducers } from "redux";
+
+import categoryReducer from "./categoryReducer.js";
+import userReducer  from "./userReducer.js";
+import videoReducer from "./videoReducer.js";
+
+const reducer = combineReducers({
+    categories: categoryReducer,
+    user: userReducer,
+    videos: videoReducer
+});
+
+export default reducer;

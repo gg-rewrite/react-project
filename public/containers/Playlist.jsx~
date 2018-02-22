@@ -1,0 +1,62 @@
+import React from "react";
+import { connect } from "react-redux";
+import { withRouter, Link } from "react-router-dom";
+
+import { showCategory, listVideosInCategory, deleteVideoFromCategory } from "../actions/categories.js";
+import VideoLink from "./VideoLink.jsx";
+
+const mapStateToProps = state => ({category: state.categories, user:state.user});
+
+const mapDispatchToProps = dispatch => ({
+    showCategory: catId => dispatch(showCategory(catId)),
+    listVideosInCategory: catId => dispatch(listVideosInCategory(catId)),
+    deleteVideoFromCategory: (catId, videoId) => dispatch(deleteVideoFromCategory(catId, videoId))
+});
+
+class ConnectedCategory extends React.Component {
+    constructor(props) {
+	super(props);
+    }
+
+    componentDidMount() {
+	const { catId } = this.props.match.params;
+	this.props.showCategory(catId);
+	this.props.listVideosInCategory(catId);
+    }
+    
+    render() {
+	const { isAdminAccess, userData  } = this.props.user;
+	const { currentCategory, videos } = this.props.category;
+	const { catId } = this.props.match.params;
+	if (!currentCategory || !videos)
+	    return(<div>Please wait</div>);
+	return(
+	    <div>
+			<h1>{currentCategory.name}</h1>
+			<h2>{currentCategory.description}</h2>
+			{isAdminAccess
+			 ?
+			 <Link to={`/categories/${catId}/edit`}>Edit</Link>
+			 : ""}
+			 <ul>
+			     {videos.map(el =>
+				 <span key={el.id}>
+				     <VideoLink video={el} />
+				     {isAdminAccess ?
+				     <button
+					 onClick={e => this.props.deleteVideoFromCategory(catId, el.id)}
+				     >Remove</button>
+				     : ""
+				     }
+				     
+				 </span>
+			      )}
+			 </ul>
+	    </div>
+	);
+    }
+    
+}
+
+const Category = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedCategory));
+export default Category;

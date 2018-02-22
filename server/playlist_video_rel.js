@@ -27,7 +27,7 @@ playlist_video_rel.get("/:userId/playlists/:playlistId/videos", function(req, re
 playlist_video_rel.delete('/:userId/playlists/:playlistId/videos/:id', function(req, res) {
   console.log("DELETE request for removing the video %s from playlist %s received for user %s", req.params.id, req.params.playlistId, req.params.userId);
 
-	dbconst.db.none("delete from playlist_video_rel where id = $1 and playlist_id = $2", [req.params.id, req.params.playlistId])
+    dbconst.db.none("delete from playlist_video_rel where video_id = $1 and playlist_id = $2", [req.params.id, req.params.playlistId])
 	.then(function(data) {
 		console.log("delete successful");
 		res.sendStatus(200);

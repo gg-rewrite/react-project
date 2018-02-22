@@ -1,6 +1,7 @@
 //Modules import
 "use strict"; 
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 var https = require("https");
 var express = require("express");
@@ -19,17 +20,37 @@ var app = express();
 //app configuration
 app.use(bodyParser.json());
 app.use(express.static("public"));
-app.use(express.static("public/dashboard"));
-app.use(express.static("public/categories"));
 app.use(session({
-	secret: "fv'eklm'llkndf",
-	resave: false,
-	cookie: {maxAge: 5 * 60 * 1000},
-	store: new pgSession({
-		conString: db.sessionConnString
-	}),
-	saveUninitialized: true
+    secret: "fv'eklm'llkndf",
+    resave: false,
+    cookie: {maxAge: 5 * 60 * 1000},
+    store: new pgSession({
+	conString: db.sessionConnString
+    }),
+    saveUninitialized: true
 }));
+
+//Video views counter middleware
+app.use(function(req, res, next) {
+    if (!req.session.views) {
+	console.log("nope nope nope");
+	req.session.views++;
+    }
+    if (/^\/api\/videos\/\d+$/.test(req.originalUrl)) {
+	if (!req.session.user) {
+	    if (req.session.views === NaN)
+		req.session.views = 0;
+	    req.session.views++;
+	    console.log("Already viewed: " + req.session.views);
+	    if (req.session.views >= 9) {
+		console.log("More than 9 views, nuh-uh");
+		req.session.views = 9;
+		res.sendStatus(401);
+	    }
+	}
+    }
+    next();
+});
 
 //====Routing and request processing=======
 
@@ -69,28 +90,31 @@ app.use('/api/video_categories', video_categories);
 var category_video_rel = require("./server/category_video_rel.js");
 app.use('/api/video_categories/', category_video_rel);
 
+//Video file link
+app.get("/api/content/:contentId", function(req, res) {
+    console.log("Content request for " + req.params.contentId);
+    res.sendFile(__dirname + "/videos/" + req.params.contentId);
+});
+
 //Default routing
 app.get('/*', function(req, res) {
-
-  console.log("GET request for /*");
-
-	res.sendFile(__dirname + "/public/index.html");
-
+    console.log("GET request for /*");
+    res.sendFile(__dirname + "/public/index.html");
 });
 
 
 https.createServer(
-	{
-		key: fs.readFileSync(__dirname + "/cert/key.pem"),
-		cert: fs.readFileSync(__dirname +  "/cert/cert.pem")
-	},
-		app
+    {
+	key: fs.readFileSync(__dirname + "/cert/key.pem"),
+	cert: fs.readFileSync(__dirname +  "/cert/cert.pem")
+    },
+    app
 ).listen(8081, function() {
 
-  var host = this.address().address;
-  var port = this.address().port;
+    var host = this.address().address;
+    var port = this.address().port;
 
-  console.log("Server started at %s:%s", host, port);
+    console.log("Server started at %s:%s", host, port);
 
 });
 

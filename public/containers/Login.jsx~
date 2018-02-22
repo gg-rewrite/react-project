@@ -1,0 +1,58 @@
+import React from "react";
+import { connect } from "react-redux";
+import { withRouter, Redirect, Link } from "react-router-dom";
+
+import { login, clearServiceFields } from "../actions/users.js";
+import { USER_AUTH_FAILURE, USER_AUTH_SUCCESS } from "../actions/constants.js";
+
+const mapStateToProps = state => ({user: state.user});
+const mapDispatchToProps = dispatch => ({
+    login: (id, pw) => dispatch(login(id, pw)),
+    clearFields: () => dispatch(clearServiceFields())
+});
+
+class ConnectedLogin extends React.Component {
+    constructor(props){
+	super(props);
+	this.state = {
+	    login: "",
+	    password: ""
+	};
+    }
+
+    render() {
+	if (this.props.user.loginCode && this.props.user.loginCode === USER_AUTH_SUCCESS) {
+	    this.props.clearFields();
+	    return(<Redirect to="/"/>)
+	}
+	else return(
+	    <div>
+		Log in or
+		{" "}
+		<Link to="/register">Register</Link><br/>
+		<input
+		    onChange={e => this.setState({login: e.target.value})}
+		/><br/>
+		<input type="password"
+		       onChange={e => this.setState({password: e.target.value})}
+		/>
+		<button disabled={
+		    !this.state.login
+		    || !this.state.password
+				 }
+			onClick={e => this.props.login(
+				this.state.login,
+				this.state.password
+			    )}
+		>
+		    Log in
+		</button>
+		{this.props.user.loginCode === USER_AUTH_FAILURE}
+	    </div>
+	);
+    }
+    
+}
+
+const Login = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedLogin));
+export default Login;
