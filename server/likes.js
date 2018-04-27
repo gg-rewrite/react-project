@@ -11,7 +11,7 @@ var likes = express.Router();
 likes.get("/:videoId/likes", function(req, res) {
   console.log("GET request for likes for video %s received", req.params.videoId);
 
-	dbconst.db.any('select l.user_id, u.name from likes l join users u on u.id = l.user_id where video_id = $1',[req.params.videoId])
+	dbconst.db.any('select l.user_id from likes l join users u on u.id = l.user_id where video_id = $1',[req.params.videoId])
 		.then(function(data) {
 			console.log(data.length + "rows received");
 			res.json(data);
@@ -64,11 +64,11 @@ likes.delete('/:videoId/likes/:userId', function(req, res) {
 
 //Add a new like
 likes.post('/:videoId/likes/', function(req,res) {
-  console.log('POST request for adding a like to the video %s by user %s received', req.params.videoId, req.params.userId);
+  console.log('POST request for adding a like to the video %s by user %s received', req.params.videoId, req.body.userId);
 
 	let userId = req.body.user_id;
 	dbconst.db.none("insert into likes(video_id, user_id) values($1, $2)", 
-		[req.params.videoId, userId])
+		[req.params.videoId, req.body.userId])
 	.then(function(data) {
 		console.log("Like added");
 		res.sendStatus(201);

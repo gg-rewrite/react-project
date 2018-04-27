@@ -1,0 +1,47 @@
+import React from "react";
+import { Provider } from "react-redux";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+
+import App from "./App.jsx";
+import Users from "./Users.jsx";
+import Categories from "./Categories.jsx";
+import Category from "./Category.jsx";
+import Video from "./Video.jsx";
+import VideoUpload from "./VideoUpload.jsx";
+import Login from "./Login.jsx";
+import Register from "./Register.jsx";
+import AddCategory from "./AddCategory.jsx";
+import EditCategory from "./EditCategory.jsx";
+import EditVideo from "./EditVideo.jsx";
+import Playlists from "./Playlists.jsx";
+import Playlist  from "./Playlist.jsx";
+import AddPlaylist from "./AddPlaylist.jsx";
+import User from "./User.jsx";
+import Videos from "./Videos.jsx";
+
+const Root = ({ store }) => (
+    <Provider store={store}>
+	<BrowserRouter>
+	    <div>
+		<Route path="/" component={App}/>
+		<Switch>
+		    <Route exact path="/login" component={Login}/>
+		    <Route exact path="/register" component={Register}/>
+		    <Route exact path="/categories" component={Categories}/>
+		    <Route exact path="/categories/new" component={AddCategory}/>
+		    <Route exact path="/categories/:catId" component={Category}/>
+		    <Route exact path="/categories/:catId/edit" component={EditCategory}/>
+		    <Route exact path="/users/:userId" component={User}/>
+		    <Route exact path="/users" component={Users} />
+		    <Route exact path="/videos/:videoId" component={Video}/>
+		    <Route exact path="/videos/:videoId/edit" component={EditVideo}/>
+		    <Route exact path="/videos" component={Videos}/>
+		    <Route exact path="/videoUpload" component={VideoUpload}/>
+		    <Route exact path="/playlists" component={Playlists}/>
+		</Switch>
+	    </div>
+	</BrowserRouter>
+    </Provider>
+);
+
+export default Root;

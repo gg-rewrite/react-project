@@ -1,0 +1,50 @@
+import axios from "axios";
+import { LIST_USERS, SHOW_USER, AUTHORIZE_USER, USER_LOGGED_IN, LOGOUT_USER, REGISTER_USER, CLEAR_SERVICE_FIELDS, CODE_SUCCESS, CODE_FAILURE, ADMIN_ACCESS } from "./constants.js";
+
+const listUsersAction = () => ({type: LIST_USERS});
+const showUserAction = () => ({type: SHOW_USER});
+const loginAction = completionCode => ({type: AUTHORIZE_USER, completionCode: completionCode });
+const isLoggedInAction = (logIn, userData, isAdminAccess) => ({type: USER_LOGGED_IN, logIn: logIn, userData: userData, isAdminAccess: isAdminAccess});
+const logoutAction = () => ({type: LOGOUT_USER});
+const registerAction = completionCode => ({type: REGISTER_USER, completionCode: completionCode});
+
+export const showUser = () => dispatch => dispatch(showUserAction());
+
+export const login = (id, pw) => dispatch =>
+    axios.post("/api/auth", {login: id, password: pw})
+	 .then(response => {
+	     console.log(response.status);
+	     dispatch(loginAction(CODE_SUCCESS));
+	 }).catch(error => {
+	     dispatch(loginAction(CODE_FAILURE));
+	 });
+
+export const isLoggedIn = () => dispatch =>  
+    axios.get("/api/auth")
+	 .then(response => axios.get("/api/users/" + response.data.id) 
+	 ).then( response => 
+	      dispatch(isLoggedInAction(
+		 true,
+		 response.data,
+		 response.data.role_id === 1 ? true : false
+	     ))
+	 ).catch(error => {
+	     dispatch(isLoggedInAction(false, "", false));
+	 });
+
+export const logout = () => dispatch =>
+    axios.post("/api/auth/logout")
+	 .then(dispatch(logoutAction()))
+	 .catch(error => console.log(error));
+
+export const register = (id, pw) => dispatch =>
+    axios.post("/api/users", {login: id, password: pw})
+	 .then( response => {
+	     console.log(response.status);
+	     dispatch(registerAction(CODE_SUCCESS));
+	 }).catch(error => {
+	     console.log(error);
+	     dispatch(registerAction(CODE_FAILURE));
+	 });
+
+export const isAdminAccess = () => dispatch => (dispatch({type: ADMIN_ACCESS}));

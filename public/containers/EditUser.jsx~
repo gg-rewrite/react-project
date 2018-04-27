@@ -1,0 +1,87 @@
+import React from "react";
+import { connect } from "react-redux";
+import { withRouter, Redirect } from "react-router-dom";
+
+import { showUser, editUser } from "../actions/users.js";
+import { CODE_SUCCESS, CODE_FAILURE }  from "../actions/constants.js";
+
+const mapStateToProps = state => ({user: state.user});
+const mapDispatchToProps = dispatch => ({
+    showUser: userId => dispatch(showUser(userId)),
+    editUser: (userId, user) => dispatch(editUser(userId, user))
+});
+
+class ConnectedUsers extends React.Component {
+
+    constructor(props) {
+	super(props);
+	this.state = {
+	    login: "",
+	    password: "",
+	    passwordConfirm: "",
+	    role: 2
+	};
+    }
+
+    componentDidMount() {
+	this.props.showUser(this.props.match.params.userId);
+    }
+    
+    render() {
+	const { completionCode } = this.props.user;
+	if (completionCode && completionCode === CODE_SUCCESS)
+	    return(<Redirect to="/users"/>);
+	const {loggedIn, isAdminAccess, userData, currentUser } = this.props.user;
+	if (!isAdminAccess)
+	    return(<div>Access denied</div>);
+	if (!currentUser)
+	    return(<div>Please wait</div>);
+	return(
+	    <div>
+		Admin edit user<br/>
+		Name: <br/>
+		<input
+		    placeholder={currentUser.name}
+		    onChange={e => this.setState({login: e.target.value})}
+		/> <br/>
+		Password: <br/>
+		<input
+		    placeholder={currentUser.password}
+		    type="password"
+		    onChange={e => this.setState({password: e.target.value})}
+		/> <br/>
+		Password confirm: <br/>
+		<input
+		    type="password"
+		    placeholder={currentUser.password}
+		    onChange={e => this.setState({passwordConfirm: e.target.value})}
+/> <br/>
+		{this.state.password !== this.state.passwordConfirm
+		 ? "Password and confirmation don't match"
+		 : ""
+		} <br/>
+		<input type="checkbox"  value={this.state.role} onChange={e => {
+			if (e.target.value === "1") {
+			    this.setState({role: 2});
+			} else {
+			    this.setState({role: 1});
+			}
+		    }} />
+		Admin
+		<br/>
+		<button
+		    disabled={!this.state.login || !this.state.password
+			   || !this.state.passwordConfirm
+			   || (this.state.password !== this.state.passwordConfirm)
+			     }
+		    onClick={e => this.props.editUser(currentUser.id, this.state)}
+		>Submit</button>
+		
+	    </div>
+	);
+	
+    }
+}
+
+const Users = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedUsers));
+export default Users;

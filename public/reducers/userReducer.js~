@@ -1,0 +1,23 @@
+import initialState from "../store/state.js";
+import { LIST_USERS, SHOW_USER, AUTHORIZE_USER, USER_LOGGED_IN, LOGOUT_USER, REGISTER_USER, ADMIN_ACCESS } from "../actions/constants.js";
+
+const userReducer = (state = initialState, action) => {
+    switch (action.type) {
+	case LIST_USERS:
+	    return state;
+	case SHOW_USER:
+	    return {...state, completionCode: undefined};
+	case AUTHORIZE_USER:
+	    return {...state, completionCode: action.completionCode};
+	case USER_LOGGED_IN:
+	    return {...state, loggedIn: action.logIn, userData: action.userData, completionCode: undefined, isAdminAccess: action.isAdminAccess};
+	case LOGOUT_USER:
+	    return {...state, loggedIn: false, userData: undefined, isAdminAccess: false};
+	case REGISTER_USER:
+	    return {...state, completionCode: action.completionCode};
+	default:
+	    return state;
+    }
+};
+
+export default userReducer;

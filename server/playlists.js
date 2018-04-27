@@ -66,16 +66,18 @@ playlists.put('/:userId/playlists/:id', function(req, res) {
 
 //Delete playlist
 playlists.delete('/:userId/playlists/:id', function(req, res) {
-  console.log("DELETE request for updating the playlist id %s for user %s received", req.params.id, req.params.userId);
+    console.log("DELETE request for updating the playlist id %s for user %s received", req.params.id, req.params.userId);
 
+    dbconst.db.none("delete from playlist_video_rel where playlist_id = $1", [req.params.id])
+    .then(function(data) {
 	dbconst.db.none("delete from playlists where id = $1 and user_id = $2", [req.params.id, req.params.userId])
-	.then(function(data) {
-		console.log("delete successful");
-		res.sendStatus(200);
-	}).catch(function(err) {
-		console.log("Query error: " + err);
-		res.sendStatus(500);
-	});
+	   }).then(function(data) {
+	       console.log("delete successful");
+	       res.sendStatus(200);
+	   }).catch(function(err) {
+	       console.log("Query error: " + err);
+	       res.sendStatus(500);
+	   });
 
 });
 

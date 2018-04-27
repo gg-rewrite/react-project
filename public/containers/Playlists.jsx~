@@ -1,0 +1,22 @@
+import React from "React";
+import { connect } from "react-redux";
+import { Link, withRouter } from "react-router-dom";
+
+import { listPlaylists } from "../actions/playlists.js":
+
+const mapStateToProps = state => ({playlists: state.playlists, user:state.users});
+const mapDispatchToProps = dispatch => ({
+    listPlaylists: userId => dispatch(listPlaylists(userId))
+});
+
+class ConnectedPlaylists extends React.Component {
+    constructor(props) {
+	super(props);
+    }
+    render() {
+	return(<div>Playlists</div>);
+    }
+}
+
+const Playlists = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedPlaylists));
+export default Playlists;

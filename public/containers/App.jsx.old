@@ -1,0 +1,62 @@
+import React from "react";
+import { Link,withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+
+import Categories from "./Categories.jsx";
+import Users from "./Users.jsx";
+import VideoSearch from "./VideoSearch.jsx";
+import Playlists from "./Playlists.jsx";
+import { isLoggedIn, logout } from "../actions/users.js";
+
+const mapStateToProps = state => ({
+    user: state.user
+});
+const mapDispatchToProps = dispatch => ({
+    isLoggedIn: () => dispatch(isLoggedIn()),
+    logout: () => dispatch(logout())
+});
+
+class ConnectedApp extends React.Component {
+    constructor(props) {
+	super(props);
+    }
+
+    componentDidMount() {
+	this.props.isLoggedIn();
+    }
+
+    render() {
+	const { loggedIn, isAdminAccess, userData } = this.props.user;
+	return(
+	    <div>
+		<Link to="/categories">Categories</Link>
+		{" "}
+		<Link to="/videos">Videos</Link>
+		{" "}
+		{isAdminAccess ?
+		 <span>
+		     <Link to="/videoUpload">Video Upload</Link>
+		     {" "}
+		     <Link to="/users">Users</Link>
+		 </span>: ""}
+		{" "}
+		{loggedIn ? <Link to="/playlists">Playlists</Link> : ""}
+		{" "}
+		Welcome, {loggedIn ? `${userData.name}` : "guest"}
+		{" "}
+	    {loggedIn ?
+	     <button onClick={e => this.props.logout()}>
+		 Log out
+	     </button> :
+	     <Link to="/login">Log in</Link>
+	    }
+		
+		<VideoSearch/>
+	    </div>
+	);
+    }
+
+}
+
+const App = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedApp));
+export default App;

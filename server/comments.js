@@ -9,11 +9,11 @@ var comments = express.Router();
 
 //list all comments
 comments.get("/:videoId/comments", function(req, res) {
-  console.log("GET request for comments received");
+  console.log("GET request for comments to video %s received", req.params.videoId);
 
-	dbconst.db.any('select c.id, c.user_id, u.name, c.text  from comments c join users u on (u.id = c.user_id) where c.video_id = $1',[req.params.videoId])
+	dbconst.db.any('select c.id, c.user_id, u.name, c.text  from comments c join users u on (u.id = c.user_id) where c.video_id = $1 order by c.id desc',[req.params.videoId])
 		.then(function(data) {
-			console.log(data.length + "rows received");
+			console.log(data.length + " rows received");
 			res.json(data);
 		}).catch(function(err) {
 			console.log("query error: " + err);			

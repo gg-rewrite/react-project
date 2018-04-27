@@ -1,0 +1,5 @@
+import initialState from "../store/state.js";
+
+const playlistReducer = (state = initialState, action) => state;
+
+export default playlistReducer;

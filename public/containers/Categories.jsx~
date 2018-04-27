@@ -1,0 +1,54 @@
+import React from "react";
+import { connect } from "react-redux";
+import { Link, withRouter } from "react-router-dom";
+
+import { listCategories, deleteCategory } from "../actions/categories.js";
+
+const mapStateToProps = state => ({category: state.categories, user: state.user});
+
+const mapDispatchToProps = dispatch => ({
+    listCategories: () => dispatch(listCategories()),
+    deleteCategory: catId => dispatch(deleteCategory(catId))
+});
+
+class ConnectedCategories extends React.Component {
+    constructor(props) {
+	super(props);
+    }
+
+    componentDidMount() {
+	this.props.listCategories();
+    }
+    
+    render() {
+
+	const { isAdminAccess } = this.props.user;
+
+	if (!this.props.category.list)
+	    return(
+		<div>Please wait</div>
+	    ); else 
+	return(
+	    <div>
+		Categories<br/>
+		<ul>
+		    {this.props.category.list.map((el, i) =>
+			<li key={i}>
+			    <Link to={`${this.props.match.url}/${el.id}`}>{el.name}</Link>
+			    {" "}
+			{isAdminAccess ? <span>
+		    <Link to={`${this.props.match.url}/${el.id}/edit`}>Edit</Link>
+		    <button onClick={e => this.props.deleteCategory(el.id)}>Delete</button>
+			</span>
+		       : "" }
+			</li>)}
+		</ul>
+		{isAdminAccess ? <Link to="/categories/new">Add category</Link> : ""}
+	    </div>
+	);
+    };
+};
+
+const Categories = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedCategories));
+
+export default Categories;

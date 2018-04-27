@@ -1,0 +1,56 @@
+import React from "react";
+import { connect } from "react-redux";
+import { withRouter, Redirect } from "react-router-dom";
+
+import { addPlaylist } from "../actions/playlists.js";
+import { CODE_SUCCESS, CODE_FAILURE } from "../actions/constants.js";
+
+const mapStateToProps = state => ({playlist: state.playlists, user: state.user});
+const mapDispatchToProps = dispatch => ({
+    addPlaylist: (userId, playlist) => dispatch(addPlaylist(userId, playlist))
+});
+
+class ConnectedAddPlaylist extends React.Component {
+    constructor(props) {
+	super(props);
+	this.state = {
+	    name: "",
+	    description: ""
+	};
+    }
+    render() {
+	if (this.props.playlist.completionCode
+	 && this.props.playlist.completionCode === CODE_SUCCESS)
+	    return(<Redirect to="/playlists"/>);
+	const { loggedIn, userData } = this.props.user;
+	if (!loggedIn)
+	    return(<div>Access denied</div>);
+	return(
+	    <div>
+		Add Playlist<br/>
+		Name
+		{" "}
+		<input onChange={e => this.setState({name: e.target.value})}/><br/>
+		Description
+		{" "}
+		<input onChange={e => this.setState({description: e.target.value})}/><br/>
+		<button
+disabled={
+    !this.state.name || !this.state.description
+	 }
+onClick={e => this.props.addPlaylist(userData.id, this.state)}
+		>Add
+		</button>
+		{this.props.playlist.completionCode
+		 && this.props.playlist.completionCode === CODE_FAILURE
+		 ? "Adding playlist failed"
+		 : ""
+		}
+	    </div>
+	)
+    }
+    
+}
+
+const AddPlaylist = withRouter(connect(mapStateToProps,mapDispatchToProps)(ConnectedAddPlaylist));
+export default AddPlaylist;

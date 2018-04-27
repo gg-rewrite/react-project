@@ -1,0 +1,137 @@
+import React from "react";
+import { connect } from "react-redux";
+import { Link, withRouter } from "react-router-dom";
+
+import { showVideo, listCategoriesForVideo, deleteVideo, listLikes, addLike, deleteLike, listComments, addComment } from "../actions/videos.js";
+
+const mapStateToProps = state => ({
+    video: state.videos,
+    user: state.user
+});
+const mapDispatchToProps = dispatch => ({
+    showVideo: videoId  => dispatch(showVideo(videoId)),
+    listCategories: videoId => dispatch(listCategoriesForVideo(videoId)),
+    deleteVideo: videoId => dispatch(deleteVideo(videoId)),
+    listLikes: videoId => dispatch(listLikes(videoId)),
+    addLike: (videoId, userId) => dispatch(addLike(videoId, userId)),
+    deleteLike: (videoId, userId) => dispatch(deleteLike(videoId, userId)),
+    listComments: videoId => dispatch(listComments(videoId)),
+    addComment: (videoId, userId, text) => dispatch(addComment(videoId, userId, text))
+});
+
+class ConnectedVideo extends React.Component {
+
+    constructor(props) {
+	super(props);
+	this.state = {
+	    comment: ""
+	};
+    }
+
+    componentDidMount() {
+	const { videoId } = this.props.match.params;
+	this.props.showVideo(videoId);
+	this.props.listCategories(videoId);
+	this.props.listLikes(videoId);
+	this.props.listComments(videoId);
+    }
+    
+    render() {
+	const { loggedIn, isAdminAccess, userData } = this.props.user;
+	const { currentVideo, likes, comments, notFound } = this.props.video;
+	if (!currentVideo || !likes || !comments)
+	    return(<div>Please wait</div>);
+	if (notFound)
+	    return(<div>Video not found (sorry about that)</div>);
+	const { videoId } = this.props.match.params;
+	const userId = userData ? userData.id: undefined;
+	const location = "/api/content/" + currentVideo.location;
+	return(
+	    <div>
+		<video src={location}
+		       controls
+		       height="480"
+		       width="720">
+		    
+		</video><br/>
+		{isAdminAccess
+		 ? <span>
+		    <Link to={`${this.props.match.url}/edit`}>Edit<br/></Link>
+		    <button onClick={e => this.props.deleteVideo(currentVideo.id)}>Delete Video</button>
+		 </span>
+		 : ""
+		}
+		<h2>{currentVideo.description}</h2>
+		{" "}
+		{currentVideo.views}
+		{currentVideo.views % 10 == 1
+		 ? " view"
+		 : " views"}
+		{" "}
+		{likes.length}
+		{likes.length % 10 == 1
+		 ? " like"
+		 : " likes"
+		}
+		{" "}
+		{loggedIn
+		 ? <span>
+		     {likes.find(l => l.user_id === userData.id)
+		      ? <button
+			    onClick={e => this.props.deleteLike(videoId, userId)}
+			>Unlike</button>
+		      : <button
+			    onClick={e => this.props.addLike(videoId, userId)}
+			>Like</button> 
+	} 
+		 </span>
+		 : ""
+		}
+		 <br/>
+		{" "} 
+		<ul>
+		    {this.props.video.videoCategories
+		     ? <ul>
+		    {this.props.video.videoCategories.map(el =>
+			<li key={el.category_id}>
+			    <Link to={`/categories/${el.category_id}`}>
+				{el.name}
+			    </Link>
+			</li>
+		     )}
+		     </ul>
+		     : "Please wait"
+		    }
+	    </ul>
+	    {loggedIn
+      ?
+	     <span>
+		<textarea
+		rows="4"
+		cols="50"
+		onChange={e => this.setState({comment: e.target.value})}
+		/><br/>
+		<button
+		    disabled={!this.state.comment}
+		    onClick={e => this.props.addComment(videoId, userId, this.state.comment)}
+		>Add comment</button>
+		 </span>
+		       : ""
+	    }
+	    <ul>
+		{comments.map(el =>
+		    <li key={el.id}>
+			<b>{el.name}</b>: {el.text}
+		    </li>
+		 )}
+	    </ul>
+
+	    </div>
+	);
+    }
+    
+};
+
+const Video = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedVideo)); 
+
+export default Video;

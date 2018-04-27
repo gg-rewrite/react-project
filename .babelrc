@@ -3,5 +3,5 @@
 */  
 {
     "presets":["env", "react"],
-		"plugins":["transform-object-rest-spread","transform-es2015-parameters","transform-es2015-destructuring"]
+    "plugins": ["transform-object-rest-spread"]
 }

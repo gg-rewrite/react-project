@@ -1,0 +1,37 @@
+import React from "react";
+import { connect } from "react-redux";
+
+import { showUser } from "../actions/users.js";
+
+const mapStateToProps = state => ({user: state.user});
+const mapDispatchToProps = dispatch => ({
+    showUser: () => dispatch(showUser())
+});
+
+class ConnectedUsers extends React.Component {
+
+    constructor(props) {
+	super(props);
+    }
+
+    componentDidMount() {
+	this.props.showUser();
+    }
+    
+    render() {
+
+	if(!this.props.user.hasOwnProperty('addInfo')) {
+	    return(
+		<div>No props yet</div>
+	    );
+	} else {
+	    return(
+		<div>{this.props.user.addInfo.name}</div>
+	    );
+	}
+	
+    }
+}
+
+const Users = connect(mapStateToProps, mapDispatchToProps)(ConnectedUsers);
+export default Users;

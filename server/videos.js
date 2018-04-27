@@ -6,16 +6,8 @@ var multer = require("multer");
 var dbconst = require("./db.js");
 
 var videos = express.Router();
-var storage = multer.diskStorage({
-	destination: function (req, file, callback) {
-    callback(null, './videos');
-  },
-  filename: function (req, file, callback) {
-    callback(null, file.fieldname + '-' + Date.now());
-  }
-});
+var upload = multer({dest: 'videos/'});
 
-var upload = multer({storage: storage}).single("videoToUpload");
 
 
 //list all videos
@@ -69,6 +61,40 @@ videos.get('/:id', function(req, res) {
 
 });
 
+//get video categories by ID
+videos.get('/:id/categories', function(req, res) {
+    console.log("GET request for video %s 's categories received", req.params.id);
+
+    dbconst.db.any("select vc.category_id,c.name from category_video_rel vc left join video_categories c on (vc.category_id = c.id) where video_id=$1", req.params.id)
+	   .then(function(data) {
+	       console.log(data.length + " rows received");
+	       res.json(data);
+	   }).catch(function(err) {
+	       console.log("Query error: " + err);
+	       res.sendStatus(500);
+	   });
+
+
+});
+
+//get video playlists by ID
+videos.get('/:id/playlists', function(req, res) {
+    console.log("GET request for video %s 's playlists received", req.params.id);
+
+    dbconst.db.any("select vp.playlist_id, p.name from playlist_video_rel vp left join playlists p on (vp.playlist_id = p.id) where video_id = $1", req.params.id)
+	   .then(function(data) {
+	       console.log(data.length + " rows received");
+	       res.json(data);
+	   }).catch(function(err) {
+	       console.log("Query error: " + err);
+	       res.sendStatus(500);
+	   });
+
+
+});
+
+
+
 //modify video
 videos.put('/:id', function(req, res) {
   console.log("put request for updating the video id %s received", req.params.id);
@@ -88,45 +114,43 @@ videos.put('/:id', function(req, res) {
 
 //Delete video
 videos.delete('/:id', function(req, res) {
-  console.log("DELETE request for updating the video id %s received", req.params.id);
-
-	dbconst.db.none("delete from videos where id = $1", [req.params.id])
-	.then(function(data) {
-		console.log("delete successful");
-		res.sendStatus(200);
-	}).catch(function(err) {
-		console.log("Query error: " + err);
-		res.sendStatus(500);
-	});
+    console.log("DELETE request for updating the video id %s received", req.params.id);
+    dbconst.db.none("delete from comments where video_id = $1", [req.params.id])
+	   .then(function(data) {
+	       dbconst.db.none("delete from likes where video_id = $1", [req.params.id])
+	   }).then(function(data) {
+	       dbconst.db.none("delete from playlist_video_rel where video_id = $1", [req.params.id])
+	   }).then(function(data) {
+	       dbconst.db.none("delete from category_video_rel where video_id = $1", [req.params.id])
+	   }).then(function(data) {
+	       dbconst.db.none("delete from videos where id = $1", [req.params.id])
+	   }).then(function(data) {
+	       console.log("delete successful");
+	       res.sendStatus(200);
+	   }).catch(function(err) {
+	       console.log("Query error: " + err);
+	       res.sendStatus(500);
+	   });
 
 });
-
-
 
 //Add a new video
-videos.post('/', function(req,res) {
-  console.log('POST request for creating a video received');
+videos.post('/', upload.single("videoToUpload"), function(req,res) {
+    console.log('POST request for creating a video received');
 
-	upload(req, res, function(err) {
-		if (err) {
-			res.sendStatus(500);
-		} else {
-			console.log(req.file);
-			console.log(req.body);
-
-			dbconst.db.none("insert into videos(description, location, views) values($1, $2, 0)", 
-				[req.body.description, req.file.filename])
-			.then(function(data) {
-				console.log("Video uploaded");
-				res.sendStatus(201);
-			}).catch(function(err) {
-				console.log("Query error: " + err);
-				res.sendStatus(500);
-			});
-		}
-	});
-
-
+    dbconst.db.none("insert into videos(description, location, views) values($1, $2, 0)",
+		    [req.body.description, req.file.filename])
+   .then(function(data) {
+       console.log("Video uploaded");
+       res.sendStatus(201);
+   }).catch(function(err) {
+       console.log("Query error: " + err);
+       res.sendStatus(500);
+   });
 });
+
+
+
+
 
 module.exports = videos;

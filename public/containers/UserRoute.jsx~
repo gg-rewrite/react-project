@@ -1,0 +1,12 @@
+import React from "react";
+import { Route, Redirect, Link, withRouter } from "react-router-dom";
+
+const UserRoute = props => (
+    <div>
+	User Link
+	{props.from}
+	{props.component}
+    </div>
+);
+
+export default UserRoute;

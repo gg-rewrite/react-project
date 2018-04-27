@@ -1,0 +1,47 @@
+import React from "react";
+import { connect } from "react-redux";
+import { withRouter, Link } from "react-router-dom";
+
+import { showCategory } from "../actions/categories.js";
+import Videos from "./Videos.jsx";
+
+const mapStateToProps = state => ({category: state.categories, user:state.user});
+
+const mapDispatchToProps = dispatch => ({
+    showCategory: catId => dispatch(showCategory(catId))
+});
+
+class ConnectedCategory extends React.Component {
+    constructor(props) {
+	super(props);
+    }
+
+    componentDidMount() {
+	this.props.showCategory(this.props.match.params.catId);
+    }
+    
+    render() {
+	const userData = this.props.user.userData ? this.props.user.userData : "";
+	const adminAccess = (userData && userData.role_id === 1);
+	if (!this.props.category.hasOwnProperty('currentCategory'))
+	    return(<div>Please wait</div>)
+	else
+	    return(
+	    <div>
+			<h1>{this.props.category.currentCategory.name}</h1>
+			<h2>{this.props.category.currentCategory.description}</h2>
+			{adminAccess
+			 ?
+			 <div>
+			     <Link to={`/categories/${this.props.match.params.catId}/edit`}>Edit</Link>
+			 </div>
+			: ""}
+			<Videos catId={this.props.match.params.catId}/>
+	    </div>
+	);
+    }
+    
+}
+
+const Category = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedCategory));
+export default Category;

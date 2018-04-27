@@ -11,7 +11,7 @@ var users = express.Router();
 users.get("/", function(req, res) {
   console.log("GET request for users received");
 
-	dbconst.db.any('select id, name from users',[])
+	dbconst.db.any('select id, name, role_id from users',[])
 		.then(function(data) {
 			console.log(data.length + "rows received");
 			res.json(data);
@@ -28,7 +28,7 @@ users.get("/", function(req, res) {
 users.get('/:id', function(req, res) {
   console.log("GET request for user %s received", req.params.id);
 
-	dbconst.db.any("select name,role_id from users where id = $1", [req.params.id])
+	dbconst.db.any("select id, name, password, role_id from users where id = $1", [req.params.id])
 	.then(function(data) {
 		console.log(data.length + " rows received");
 		if (data.length > 0) {
@@ -67,16 +67,21 @@ users.put('/:id', function(req, res) {
 
 //Delete user
 users.delete('/:id', function(req, res) {
-  console.log("DELETE request for updating the user id %s received", req.params.id);
-
-	dbconst.db.none("delete from users where id = $1", [req.params.id])
-	.then(function(data) {
-		console.log("delete successful");
-		res.sendStatus(200);
-	}).catch(function(err) {
-		console.log("Query error: " + err);
-		res.sendStatus(500);
-	});
+    console.log("DELETE request for updating the user id %s received", req.params.id);
+    dbconst.db.none("delete from comments where user_id = $1", [req.params.id])
+	   .then(function(data) {
+	       dbconst.db.none("delete from likes where user_id = $1", [req.params.id])
+	   }).then(function(data) {
+	       dbconst.db.none("delete from playlists where user_id = $1", [req.params.id])
+	   }).then(function(data) {
+	       dbconst.db.none("delete from users where id = $1", [req.params.id])
+	   }).then(function(data) {
+	       console.log("delete successful");
+	       res.sendStatus(200);
+	   }).catch(function(err) {
+	       console.log("Query error: " + err);
+	       res.sendStatus(500);
+	   });
 
 });
 

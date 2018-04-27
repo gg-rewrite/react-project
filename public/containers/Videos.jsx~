@@ -1,0 +1,51 @@
+import React from "react";
+import { connect } from "react-redux";
+import { Link, withRouter } from "react-router-dom";
+
+import { listVideosInCategory } from "../actions/categories.js";
+
+const mapDispatchToProps = dispatch => ({
+    listVids: catId => dispatch(listVideosInCategory(catId))
+});
+
+const mapStateToProps = state => ({category: state.categories });
+
+class ConnectedVideos extends React.Component{
+    constructor(props) {
+	super(props);
+    }
+
+    componentDidMount() {
+	if (this.props.hasOwnProperty('catId'))
+	    this.props.listVids(this.props.catId);
+    }
+
+    
+
+    render() {
+	if (!this.props.category.hasOwnProperty('videos'))
+	    return(<div>Please wait</div>)
+	else return(
+	    <div>
+		{this.props.category.videos.length == 0
+		 ? "No videos"
+		 : "Videos"
+		}
+		{" "}
+		<ul>
+		    {this.props.category.videos.map((el, i) =>
+			<li key={i}>
+			    <Link to={`/videos/${el.video_id}`}>
+				{el.description}
+			    </Link>
+			</li>
+		     )}
+		</ul>
+	    </div>
+	);
+    }
+}
+
+const Videos = withRouter(connect(mapStateToProps, mapDispatchToProps)(ConnectedVideos));
+
+export default Videos;
